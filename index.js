@@ -45,8 +45,7 @@ if (cluster.isMaster) {
     cors: {
       //origin: "http://localhost:3000",
       origin: "https://lush-agreement.surge.sh",
-      methods: ["GET", "POST"],
-      credentials: true
+      methods: ["GET", "POST"]
     },
   });
 
