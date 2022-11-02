@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  transports: [ "websocket" ],
+  transports: [ "websocket", "polling" ],
   cors: {
     //origin: "http://localhost:3000",
     origin: "https://lush-agreement.surge.sh",
