@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
   if (!username) {
-    return next(new Error("invalid username"));
+    return next(new Error("invalid username", socket.handshake.auth));
   }
   socket.username = username;
   next();
