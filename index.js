@@ -45,7 +45,7 @@ if (cluster.isMaster) {
     transports: ["websocket"],
     cors: {
       //origin: "http://localhost:3000",
-      origin: "https://lush-agreement.surge.sh",
+      //origin: "https://lush-agreement.surge.sh",
       methods: ["GET", "POST"]
     },
   });
@@ -58,8 +58,7 @@ if (cluster.isMaster) {
 
   // Private messaging:   https://socket.io/get-started/private-messaging-part-1/
 io.use((socket, next) => {
-  //const username = socket.handshake.auth.username;
-  const username = socket.username;
+  const username = socket.handshake.auth.username;
   if (!username) {
     return next(new Error("invalid username"));
   }
