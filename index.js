@@ -3,7 +3,7 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const http = require("http");
-const { Server } = require("socket.io");
+const { Server } = require("socket.io")({transports:'websocket'});
 
 const app = express();
 
