@@ -46,6 +46,7 @@ if (cluster.isMaster) {
       //origin: "http://localhost:3000",
       origin: "https://lush-agreement.surge.sh",
       methods: ["GET", "POST"],
+      credentials: true
     },
   });
 
