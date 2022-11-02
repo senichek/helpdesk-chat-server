@@ -61,7 +61,7 @@ io.use((socket, next) => {
   const username = socket.handshake.auth.username;
   if (!username) {
     //return next(new Error("invalid username", socket.handshake.auth));
-    return next(new Error(socket.handshake.auth));
+    return next(new Error(socket.handshake.auth.username));
   }
   socket.username = username;
   next();
