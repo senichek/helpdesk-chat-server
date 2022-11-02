@@ -1,60 +1,36 @@
+// Chat server (Socket IO)
 require("dotenv").config();
+const cors = require("cors");
+
 const cluster = require("cluster");
-const http = require("http");
-const { Server } = require("socket.io");
+
 const numCPUs = require("os").cpus().length;
 const { setupMaster, setupWorker } = require("@socket.io/sticky");
 const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
 
-if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
-  const httpServer = http.createServer();
 
-  // setup sticky sessions
-  setupMaster(httpServer, {
-    loadBalancingMethod: "least-connection",
-  });
 
-  // setup connections between the workers
-  setupPrimary();
 
-  // needed for packets containing buffers (you can ignore it if you only send plaintext objects)
-  // Node.js < 16.0.0
-  cluster.setupMaster({
-    serialization: "advanced",
-  });
-  // Node.js > 16.0.0
-  // cluster.setupPrimary({
-  //   serialization: "advanced",
-  // });
 
-  const port = process.env.PORT;
-  httpServer.listen(port, () => {
-    console.log(`Help-desker chat server is listening on port ${port}`)
-  });
 
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
 
-  cluster.on("exit", (worker) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    cluster.fork();
-  });
-} else {
-  console.log(`Worker ${process.pid} started`);
+const app = express();
 
-  const httpServer = http.createServer();
-  const io = new Server(httpServer);
+const server = http.createServer(app);
 
-  // use the cluster adapter
-  io.adapter(createAdapter());
+const io = new Server(server, {
+  cors: {
+    //origin: "http://localhost:3000",
+    origin: "https://lush-agreement.surge.sh",
+    methods: ["GET", "POST"],
+  },
+});
 
-  // setup connection with the primary process
-  setupWorker(io);
-
-  // Private messaging:   https://socket.io/get-started/private-messaging-part-1/
+// Private messaging:   https://socket.io/get-started/private-messaging-part-1/
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
   if (!username) {
@@ -64,7 +40,7 @@ io.use((socket, next) => {
   next();
 });
 
- // Get the list of all connected clients (users)
+// Get the list of all connected clients (users)
 io.on("connection", (socket) => {
   console.log("Established chat connection")
   const users = [];
@@ -117,4 +93,8 @@ io.on("connection", (socket) => {
 
 });
 
-}
+const chatServerPort = process.env.PORT;
+
+server.listen(chatServerPort, () => {
+  console.log(`Help desk chat server is listening on port ${chatServerPort}`);
+});
