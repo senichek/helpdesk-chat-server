@@ -6,6 +6,7 @@ const numCPUs = require("os").cpus().length;
 const { setupMaster, setupWorker } = require("@socket.io/sticky");
 const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
 
+// Taken from https://socket.io/docs/v4/using-multiple-nodes/#using-nodejs-cluster
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
 
@@ -19,15 +20,9 @@ if (cluster.isMaster) {
   // setup connections between the workers
   setupPrimary();
 
-  // needed for packets containing buffers (you can ignore it if you only send plaintext objects)
-  // Node.js < 16.0.0
   cluster.setupMaster({
     serialization: "advanced",
   });
-  // Node.js > 16.0.0
-  // cluster.setupPrimary({
-  //   serialization: "advanced",
-  // });
 
   const port = process.env.PORT;
   httpServer.listen(port, () => {
@@ -46,7 +41,13 @@ if (cluster.isMaster) {
   console.log(`Worker ${process.pid} started`);
 
   const httpServer = http.createServer();
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, {
+    cors: {
+      //origin: "http://localhost:3000",
+      origin: "https://lush-agreement.surge.sh",
+      methods: ["GET", "POST"],
+    },
+  });
 
   // use the cluster adapter
   io.adapter(createAdapter());
