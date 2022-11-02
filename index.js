@@ -42,6 +42,7 @@ if (cluster.isMaster) {
 
   const httpServer = http.createServer();
   const io = new Server(httpServer, {
+    transports: ["websocket"],
     cors: {
       //origin: "http://localhost:3000",
       origin: "https://lush-agreement.surge.sh",
